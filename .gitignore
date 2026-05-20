@@ -1,0 +1,22 @@
+# Python / Django
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+*.log
+
+# Ambientes Virtuais
+venv/
+env/
+.venv/
+
+# Docker e Variáveis de Ambiente
+.env
+
+# SO
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
