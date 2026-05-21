@@ -1,120 +1,36 @@
-# Gestão Imobiliária Django
+# Sistema de Gestão Imobiliária
 
-Projeto desenvolvido para o **Trabalho Prático 1 - Projeto Django**, da disciplina de **Programação Web**.
+Projeto desenvolvido para o **Trabalho Prático 1** da disciplina **GAC116 — Programação Web — 2026/1**.
 
 O objetivo do CheckPoint 1 é entregar a **modelagem do domínio** e um **ambiente administrativo configurado**, sem utilizar o template padrão do Django Admin.
 
-Este projeto implementa um sistema administrativo para gestão de imóveis, clientes, imagens de imóveis e contratos de aluguel.
+---
 
-## Tema do Projeto
+## Tecnologias
 
-**Sistema de Gestão Imobiliária**
+| Camada | Tecnologia |
+|--------|-----------|
+| Backend | Python 3.12 + Django 6.0.5 |
+| Banco de dados | PostgreSQL 15 |
+| Frontend | Bootstrap 5 + Bootstrap Icons |
+| Admin | Django Unfold |
+| Upload de imagens | Pillow |
+| Conteinerização | Docker + Docker Compose |
 
-O sistema permite cadastrar clientes, imóveis disponíveis para aluguel, imagens associadas aos imóveis e contratos de aluguel firmados entre clientes e imóveis.
+---
 
-## Tecnologias Utilizadas
+## Funcionalidades
 
-- Python 3.12
-- Django 6.0.5
-- Django Unfold
-- Pillow
-- PostgreSQL
-- Docker
-- Docker Compose
+- Cadastro e gestão de clientes, imóveis, imagens e contratos via painel admin
+- Área pública de listagem e detalhe de imóveis (filtros por busca, status e bairro)
+- Upload de imagens por imóvel com legendas
+- Controle de status do imóvel: disponível, alugado, em manutenção
+- Validação de contratos: impede imóveis indisponíveis e datas inválidas
+- Alteração automática do status do imóvel ao criar um contrato
 
-## Funcionalidades Implementadas
-
-- Cadastro de clientes
-- Cadastro de imóveis
-- Cadastro de imagens vinculadas a imóveis
-- Cadastro de contratos de aluguel
-- Validação de regras de contrato
-- Alteração automática do status do imóvel ao criar contrato
-- Ambiente administrativo personalizado com Django Unfold
-- Configuração de `list_display`
-- Configuração de `search_fields`
-- Configuração de `list_filter`
-- Configuração de `inline`
-- Configuração de `clean` no modelo de contrato
+---
 
 ## Modelagem
-
-O projeto possui as seguintes entidades principais:
-
-### Cliente
-
-Representa uma pessoa cadastrada no sistema, podendo ser proprietária de imóveis ou locatária em contratos de aluguel.
-
-Campos principais:
-
-- Nome
-- CPF
-- Telefone
-- E-mail
-
-Relacionamentos:
-
-- Um cliente pode possuir vários imóveis.
-- Um cliente pode participar de vários contratos como locatário.
-
-### Imóvel
-
-Representa um imóvel administrado pela imobiliária.
-
-Campos principais:
-
-- Proprietário
-- Título
-- Endereço
-- Bairro
-- Valor do aluguel
-- Status
-
-Status possíveis:
-
-- Disponível
-- Alugado
-- Em manutenção
-
-Relacionamentos:
-
-- Um imóvel pertence a um cliente.
-- Um imóvel pode possuir várias imagens.
-- Um imóvel pode estar vinculado a contratos de aluguel.
-
-### Imagem do Imóvel
-
-Representa imagens associadas a um imóvel.
-
-Campos principais:
-
-- Imóvel
-- Imagem
-- Legenda
-
-Relacionamentos:
-
-- Cada imagem pertence a um imóvel.
-
-### Contrato de Aluguel
-
-Representa um contrato firmado entre um locatário e um imóvel.
-
-Campos principais:
-
-- Imóvel
-- Locatário
-- Data de início
-- Data de término
-- Valor fechado
-
-Regras implementadas:
-
-- A data de término deve ser posterior à data de início.
-- Um contrato só pode ser criado para imóveis disponíveis.
-- Ao criar um contrato, o status do imóvel é alterado automaticamente para `alugado`.
-
-## Diagrama Simplificado
 
 ```mermaid
 erDiagram
@@ -130,7 +46,6 @@ erDiagram
         string telefone
         string email
     }
-
     IMOVEL {
         int id
         string titulo
@@ -139,13 +54,11 @@ erDiagram
         decimal valor_aluguel
         string status
     }
-
     IMAGEM_IMOVEL {
         int id
         image imagem
         string legenda
     }
-
     CONTRATO_ALUGUEL {
         int id
         date data_inicio
@@ -154,217 +67,88 @@ erDiagram
     }
 ```
 
+---
+
 ## Ambiente Administrativo
 
-O projeto utiliza o **Django Unfold** para personalizar o ambiente administrativo, atendendo ao requisito de não utilizar apenas o template padrão do Django Admin.
-
-O painel administrativo está disponível em:
-
-```text
-http://127.0.0.1:8000/admin/
-```
-
-## Configurações do Admin
+Painel personalizado com **Django Unfold**, disponível em `/admin/`.
 
 ### ClienteAdmin
-
-Configurações implementadas:
-
-- `list_display`
-- `search_fields`
-
-Campos exibidos na listagem:
-
-- Nome
-- CPF
-- Telefone
-- E-mail
-
-Campos pesquisáveis:
-
-- Nome
-- CPF
-- E-mail
+- `list_display`: nome, CPF, telefone, e-mail
+- `search_fields`: nome, CPF, e-mail
 
 ### ImovelAdmin
-
-Configurações implementadas:
-
-- `list_display`
-- `list_filter`
-- `search_fields`
-- `inline`
-
-Campos exibidos na listagem:
-
-- Título
-- Bairro
-- Valor do aluguel
-- Status
-
-Filtros disponíveis:
-
-- Status
-- Bairro
-
-Campos pesquisáveis:
-
-- Título
-- Endereço
-- Bairro
-
-Inline configurado:
-
-- Imagens do imóvel
-
-Com isso, é possível cadastrar imagens diretamente dentro da tela de cadastro/edição de um imóvel.
+- `list_display`: título, bairro, valor do aluguel, status
+- `list_filter`: status, bairro
+- `search_fields`: título, endereço, bairro
+- `inlines`: imagens do imóvel — permite cadastrar fotos diretamente na tela do imóvel
 
 ### ContratoAluguelAdmin
+- `list_display`: imóvel, locatário, data de início, data de término, valor fechado
+- `list_filter`: data de início, data de término
+- `search_fields`: título do imóvel, nome do locatário, CPF do locatário
 
-Configurações implementadas:
+---
 
-- `list_display`
-- `list_filter`
-- `search_fields`
+## Validações
 
-Campos exibidos na listagem:
+Implementadas no método `clean` de `ContratoAluguel`:
 
-- Imóvel
-- Locatário
-- Data de início
-- Data de término
-- Valor fechado
+1. A data de término deve ser posterior à data de início.
+2. Só é possível criar um contrato para imóveis com status `disponível`.
 
-Filtros disponíveis:
+No método `save`, ao criar um novo contrato, o status do imóvel é alterado automaticamente para `alugado`.
 
-- Data de início
-- Data de término
+---
 
-Campos pesquisáveis:
+## Como Rodar
 
-- Título do imóvel
-- Nome do locatário
-- CPF do locatário
-
-## Validações Implementadas
-
-A entidade `ContratoAluguel` possui validações no método `clean`.
-
-Validações:
-
-1. A data de término do contrato deve ser posterior à data de início.
-2. Um novo contrato só pode ser criado se o imóvel estiver com status `disponível`.
-
-Além disso, o método `save` altera automaticamente o status do imóvel para `alugado` quando um novo contrato é criado.
-
-## Estrutura do Projeto
-
-```text
-gestao-imobiliaria-django/
-├── imoveis/
-│   ├── admin.py
-│   ├── apps.py
-│   ├── migrations/
-│   ├── models.py
-│   ├── tests.py
-│   └── views.py
-├── setup/
-│   ├── settings.py
-│   ├── urls.py
-│   ├── asgi.py
-│   └── wsgi.py
-├── docker-compose.yml
-├── Dockerfile
-├── manage.py
-├── requirements.txt
-├── LICENSE
-└── README.md
-```
-
-## Como Executar o Projeto Localmente
-
-### 1. Clonar o repositório
+### Com Docker (recomendado)
 
 ```bash
-git clone https://github.com/joaogsribeiro/gestao-imobiliaria-django.git
-cd gestao-imobiliaria-django
+docker-compose up --build
 ```
 
-### 2. Criar o ambiente virtual
-
-No Windows:
+Em outro terminal:
 
 ```bash
-python -m venv venv
-venv\Scripts\activate
+docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py createsuperuser
 ```
 
-No Linux/macOS:
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Instalar as dependências
+### Sem Docker
 
 ```bash
 pip install -r requirements.txt
-```
-
-### 4. Aplicar as migrações
-
-```bash
 python manage.py migrate
-```
-
-### 5. Criar um superusuário
-
-```bash
 python manage.py createsuperuser
-```
-
-### 6. Executar o servidor
-
-```bash
 python manage.py runserver
 ```
 
-Acesse o sistema em:
+---
 
-```text
-http://127.0.0.1:8000/admin/
+## Acessos
+
+| Ambiente | URL | Credenciais |
+|----------|-----|-------------|
+| Admin | `/admin/` | superusuário criado via `createsuperuser` |
+| Usuário | `/` | login via `/accounts/login/` |
+
+---
+
+## Estrutura do Projeto
+
+```
+gestao-imobiliaria-django/
+├── imoveis/          # App principal (models, views, admin)
+├── setup/            # Configurações do projeto Django
+├── templates/        # Templates HTML (Bootstrap 5)
+├── docker-compose.yml
+├── Dockerfile
+└── requirements.txt
 ```
 
-## Como Executar com Docker
-
-O projeto também possui arquivos de configuração para execução com Docker.
-
-### 1. Construir e subir os containers
-
-```bash
-docker compose up --build
-```
-
-### 2. Aplicar as migrações dentro do container
-
-Em outro terminal, execute:
-
-```bash
-docker compose exec web python manage.py migrate
-```
-
-### 3. Criar o superusuário
-
-```bash
-docker compose exec web python manage.py createsuperuser
-```
-
-### 4. Acessar o admin
-
-```text
-http://127.0.0.1:8000/admin/
-```
+---
 
 ## Checklist do CheckPoint 1
 
@@ -379,10 +163,6 @@ http://127.0.0.1:8000/admin/
 - [x] `search_fields` configurado
 - [x] `list_filter` configurado
 - [x] `inline` configurado
-- [x] Validação com `clean` configurada
+- [x] Validação com `clean` implementada
 - [x] Projeto preparado para execução local
 - [x] Projeto preparado para execução com Docker
-
-## Licença
-
-Este projeto está licenciado sob os termos da licença MIT.

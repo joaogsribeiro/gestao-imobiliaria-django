@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ imovel.titulo }} — ImobiliáriaWeb{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Imóveis</a></li>
+        <li class="breadcrumb-item active">{{ imovel.titulo }}</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <!-- Galeria de imagens -->
+    <div class="col-lg-7">
+        {% with imagens=imovel.imagens.all %}
+        {% if imagens %}
+            <div id="carouselImovel" class="carousel slide shadow rounded" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for img in imagens %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ img.imagem.url }}" class="d-block w-100 rounded"
+                             alt="{{ img.legenda|default:imovel.titulo }}"
+                             style="height: 380px; object-fit: cover;">
+                        {% if img.legenda %}
+                        <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-1">
+                            <small>{{ img.legenda }}</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if imagens.count > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselImovel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselImovel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="bg-secondary d-flex align-items-center justify-content-center rounded shadow"
+                 style="height: 380px;">
+                <i class="bi bi-image text-white" style="font-size: 5rem;"></i>
+            </div>
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Informações do imóvel -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h2 class="card-title fs-4">{{ imovel.titulo }}</h2>
+                    <span class="badge badge-{{ imovel.status }} fs-6">
+                        {{ imovel.get_status_display }}
+                    </span>
+                </div>
+
+                <p class="text-muted mb-1">
+                    <i class="bi bi-geo-alt-fill me-2 text-danger"></i>{{ imovel.endereco }}
+                </p>
+                <p class="text-muted mb-3">
+                    <i class="bi bi-map me-2 text-danger"></i>{{ imovel.bairro }}
+                </p>
+
+                <hr>
+
+                <div class="mb-3">
+                    <span class="text-muted small">Valor do aluguel</span>
+                    <p class="fs-3 fw-bold text-dark mb-0">
+                        R$ {{ imovel.valor_aluguel|floatformat:2 }}
+                        <span class="text-muted fs-6 fw-normal">/mês</span>
+                    </p>
+                </div>
+
+                <hr>
+
+                <p class="text-muted small mb-1">Proprietário</p>
+                <p class="fw-semibold"><i class="bi bi-person me-2"></i>{{ imovel.proprietario.nome }}</p>
+
+                {% if user.is_authenticated %}
+                    {% if imovel.status == 'disponivel' %}
+                    <div class="alert alert-success mt-3 mb-0" role="alert">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Imóvel disponível. Entre em contato para agendar uma visita.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-secondary mt-3 mb-0" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Este imóvel não está disponível no momento.
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <a href="/accounts/login/?next={{ request.path }}" class="btn btn-dark w-100 mt-3">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Faça login para mais informações
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="/" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Voltar para a listagem
+    </a>
+</div>
+{% endblock %}
