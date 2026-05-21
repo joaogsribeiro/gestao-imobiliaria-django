@@ -18,7 +18,7 @@ O sistema permite cadastrar clientes, imóveis disponíveis para aluguel, imagen
 - Django 6.0.5
 - Django Unfold
 - Pillow
-- SQLite
+- Postgres
 - Docker
 - Docker Compose
 
