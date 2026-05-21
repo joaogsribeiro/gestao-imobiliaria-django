@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Q
 from .models import Imovel
 
 
@@ -10,9 +11,9 @@ def home(request):
     bairro = request.GET.get('bairro', '').strip()
 
     if q:
-        imoveis = imoveis.filter(titulo__icontains=q) | \
-                  imoveis.filter(bairro__icontains=q) | \
-                  imoveis.filter(endereco__icontains=q)
+        imoveis = imoveis.filter(
+            Q(titulo__icontains=q) | Q(bairro__icontains=q) | Q(endereco__icontains=q)
+        )
     if status:
         imoveis = imoveis.filter(status=status)
     if bairro:
