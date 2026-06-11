@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-+(zbxcpp1ss6#294__*mehhv#6v34+6s$f36&mv@p+cie&5417
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '[IP_ADDRESS]']
 
 
 # Application definition
@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'imoveis.context_processors.user_context',
             ],
         },
     },

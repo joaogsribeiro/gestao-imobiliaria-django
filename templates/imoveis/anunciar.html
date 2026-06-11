@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Anunciar Imóvel — ImobiliáriaWeb{% endblock %}
+
+{% block extra_css %}
+<style>
+    .drop-zone { border:2px dashed var(--border); border-radius:var(--radius-sm); padding:1.75rem; text-align:center; transition:border-color var(--ease),background var(--ease); cursor:pointer; }
+    .drop-zone:hover,.drop-zone.drag-over { border-color:var(--accent); background:rgba(99,102,241,.04); }
+    .drop-zone input[type=file] { display:none; }
+    .preview-grid { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.75rem; }
+    .preview-item { width:90px; height:70px; border-radius:8px; overflow:hidden; border:2px solid var(--border); }
+    .preview-item img { width:100%; height:100%; object-fit:cover; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="{% url 'perfil_cliente' %}" class="text-decoration-none text-accent">Meu Perfil</a></li>
+        <li class="breadcrumb-item active text-muted">Anunciar Imóvel</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+
+        <div class="d-flex align-items-center gap-2 mb-3">
+            <div style="width:40px;height:40px;background:rgba(99,102,241,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-megaphone-fill text-accent fs-5"></i>
+            </div>
+            <div>
+                <h1 class="section-title mb-0">Anunciar Imóvel</h1>
+                <p class="text-muted small mb-0">Seu anúncio será revisado antes de ser publicado</p>
+            </div>
+        </div>
+
+        <div class="alert d-flex align-items-center gap-2 py-2 mb-4" style="background:#fef9c3;border:1px solid #fde047;border-radius:var(--radius-sm)">
+            <i class="bi bi-clock-history" style="color:#d97706"></i>
+            <span class="small" style="color:#854d0e">
+                Após o envio, um administrador revisará e aprovará o seu imóvel antes de aparecer na listagem pública.
+            </span>
+        </div>
+
+        <div class="card" style="box-shadow:0 4px 20px rgba(0,0,0,.08)">
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.titulo.label }}</label>
+                        {{ form.titulo }}
+                        {% if form.titulo.errors %}<div class="text-danger small mt-1">{{ form.titulo.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label">{{ form.endereco.label }}</label>
+                            {{ form.endereco }}
+                            {% if form.endereco.errors %}<div class="text-danger small mt-1">{{ form.endereco.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{{ form.bairro.label }}</label>
+                            {{ form.bairro }}
+                            {% if form.bairro.errors %}<div class="text-danger small mt-1">{{ form.bairro.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">{{ form.valor_aluguel.label }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text fw-semibold">R$</span>
+                            {{ form.valor_aluguel }}
+                        </div>
+                        {% if form.valor_aluguel.errors %}<div class="text-danger small mt-1">{{ form.valor_aluguel.errors }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Fotos <span class="text-muted fw-normal">(opcional)</span></label>
+                        <div class="drop-zone" id="dropZone" onclick="document.getElementById('id_imagens').click()">
+                            <input type="file" name="imagens" id="id_imagens" accept="image/*" multiple>
+                            <i class="bi bi-cloud-upload" style="font-size:2rem;color:#cbd5e1"></i>
+                            <p class="text-muted small mb-0 mt-1">
+                                <span style="color:var(--accent);font-weight:600">Clique</span> ou arraste fotos aqui
+                            </p>
+                        </div>
+                        <div class="preview-grid" id="previewGrid"></div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{% url 'perfil_cliente' %}" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-accent px-4">
+                            <i class="bi bi-send me-1"></i>Enviar para aprovação
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const input = document.getElementById('id_imagens');
+    const grid  = document.getElementById('previewGrid');
+    const zone  = document.getElementById('dropZone');
+    input.addEventListener('change', renderPreviews);
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); input.files = e.dataTransfer.files; renderPreviews(); });
+    function renderPreviews() {
+        grid.innerHTML = '';
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = ev => { const d = document.createElement('div'); d.className='preview-item'; d.innerHTML=`<img src="${ev.target.result}">`; grid.appendChild(d); };
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
+{% endblock %}

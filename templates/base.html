@@ -3,90 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gestão Imobiliária{% endblock %}</title>
+        <title>{% block title %}ImobiliáriaWeb{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .navbar-brand { font-weight: 700; letter-spacing: 0.5px; }
-        .card-imovel { transition: transform 0.2s, box-shadow 0.2s; }
-        .card-imovel:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-        .badge-disponivel { background-color: #198754; }
-        .badge-alugado { background-color: #dc3545; }
-        .badge-manutencao { background-color: #ffc107; color: #212529; }
-        footer { border-top: 1px solid #dee2e6; }
+        :root {
+            --brand:     #0f172a;
+            --brand-mid: #1e293b;
+            --accent:    #6366f1;
+            --accent-dk: #4f46e5;
+            --surface:   #f1f5f9;
+            --border:    #e2e8f0;
+            --text:      #0f172a;
+            --muted:     #64748b;
+            --radius:    12px;
+            --radius-sm: 8px;
+            --ease:      .22s ease;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--surface);
+            color: var(--text);
+            font-size: .9375rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        main { flex: 1; }
+
+        /* ─── Navbar ─── */
+        .navbar {
+            background-color: var(--brand) !important;
+            padding: .8rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            transition: box-shadow var(--ease);
+        }
+        .navbar.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,.35); }
+        .navbar-accent-line {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), #818cf8);
+        }
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -.3px;
+            color: #fff !important;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .brand-icon { color: var(--accent); font-size: 1.35rem; }
+        .brand-accent { color: var(--accent); }
+        .nav-link {
+            font-size: .875rem;
+            font-weight: 500;
+            color: #94a3b8 !important;
+            transition: color var(--ease), background var(--ease);
+            padding: .4rem .75rem !important;
+            border-radius: 6px;
+        }
+        .nav-link:hover { color: #fff !important; background: rgba(255,255,255,.08); }
+        .user-avatar {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            font-size: .75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ─── Cards ─── */
+        .card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: #fff;
+        }
+        .card-imovel {
+            transition: transform var(--ease), box-shadow var(--ease);
+            overflow: hidden;
+        }
+        .card-imovel:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(0,0,0,.1);
+        }
+
+        /* ─── Status badges ─── */
+        .badge-status {
+            font-size: .72rem;
+            font-weight: 600;
+            padding: .32em .75em;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+        }
+        .badge-disponivel { background: #dcfce7; color: #166534; }
+        .badge-alugado    { background: #fee2e2; color: #991b1b; }
+        .badge-manutencao { background: #fef9c3; color: #854d0e; }
+        .badge-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+        .badge-disponivel .badge-dot { background: #16a34a; }
+        .badge-alugado    .badge-dot { background: #dc2626; }
+        .badge-manutencao .badge-dot { background: #d97706; }
+
+        /* ─── Buttons ─── */
+        .btn-accent {
+            background: var(--accent);
+            color: #fff !important;
+            border: none;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            transition: background var(--ease), transform var(--ease), box-shadow var(--ease);
+        }
+        .btn-accent:hover {
+            background: var(--accent-dk);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(99,102,241,.4);
+        }
+        .btn-outline-accent {
+            border: 1.5px solid var(--accent);
+            color: var(--accent) !important;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            transition: all var(--ease);
+        }
+        .btn-outline-accent:hover {
+            background: var(--accent);
+            color: #fff !important;
+            border-color: var(--accent);
+        }
+
+        /* ─── Forms ─── */
+        .form-control, .form-select {
+            border-color: var(--border);
+            border-radius: var(--radius-sm);
+            font-size: .9rem;
+            padding: .55rem .85rem;
+            transition: border-color var(--ease), box-shadow var(--ease);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99,102,241,.14);
+        }
+        .form-label { font-weight: 600; font-size: .84rem; color: var(--brand-mid); margin-bottom: .3rem; }
+        .form-text  { font-size: .8rem; color: var(--muted); }
+        .input-group-text { background: var(--surface); border-color: var(--border); color: var(--muted); }
+
+        /* ─── Alerts ─── */
+        .alert { border: none; border-radius: var(--radius-sm); font-size: .9rem; }
+
+        /* ─── Helpers ─── */
+        .section-title { font-weight: 700; font-size: 1.35rem; }
+        .img-placeholder {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .text-accent { color: var(--accent) !important; }
+        .divider { border-color: #1e293b; }
+
+        /* ─── Footer ─── */
+        footer { background: var(--brand); color: #64748b; font-size: .875rem; }
+        footer .footer-heading { color: #e2e8f0; font-weight: 700; font-size: .875rem; margin-bottom: .6rem; }
+        footer a { color: #64748b; text-decoration: none; transition: color var(--ease); }
+        footer a:hover { color: #e2e8f0; }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="bi bi-buildings-fill me-2"></i>ImobiliáriaWeb
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}"><i class="bi bi-house-door me-1"></i>Imóveis</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <span class="nav-link text-light">
-                                <i class="bi bi-person-circle me-1"></i>{{ user.get_full_name|default:user.username }}
-                            </span>
-                        </li>
-                        {% if user.is_staff %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">
-                                <i class="bi bi-gear me-1"></i>Admin
-                            </a>
-                        </li>
+
+<nav class="navbar navbar-expand-lg" id="mainNav">
+    <div class="navbar-accent-line"></div>
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="bi bi-buildings-fill brand-icon"></i>
+            Imobiliária<span class="brand-accent">Web</span>
+        </a>
+        <button class="navbar-toggler border-0 p-1" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Menu">
+            <i class="bi bi-list text-white fs-4"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mt-2 mt-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">
+                        <i class="bi bi-house-door me-1"></i>Imóveis
+                    </a>
+                </li>
+                {% if user.is_staff %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'listar_clientes' %}">
+                        <i class="bi bi-people me-1"></i>Clientes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'listar_contratos' %}">
+                        <i class="bi bi-file-earmark-text me-1"></i>Contratos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center gap-1" href="{% url 'pendentes_aprovacao' %}">
+                        <i class="bi bi-clock-history"></i>Pendentes
+                        {% if pendentes_count > 0 %}
+                        <span class="badge rounded-pill ms-1" style="background:var(--accent);font-size:.65rem">{{ pendentes_count }}</span>
                         {% endif %}
-                        <li class="nav-item">
-                            <form method="post" action="{% url 'logout' %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="nav-link btn btn-link text-light">
-                                    <i class="bi bi-box-arrow-right me-1"></i>Sair
-                                </button>
-                            </form>
-                        </li>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            <ul class="navbar-nav align-items-lg-center gap-1 mt-2 mt-lg-0">
+                {% if user.is_authenticated %}
+                    {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cadastrar_imovel' %}">
+                            <i class="bi bi-plus-circle me-1"></i>Novo Imóvel
+                        </a>
+                    </li>
+                    {% elif user_cliente %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'anunciar_imovel' %}">
+                            <i class="bi bi-megaphone me-1"></i>Anunciar
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center gap-2" href="{% url 'perfil_cliente' %}">
+                            <span class="user-avatar">{{ user.username|first|upper }}</span>
+                            <span class="text-white small fw-semibold">{{ user.get_full_name|default:user.username }}</span>
+                        </a>
+                    </li>
+                    {% if user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">
+                            <i class="bi bi-gear me-1"></i>Admin
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}" class="m-0">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link btn btn-link border-0 p-1"
+                                    style="color:#f87171 !important; background:none; text-decoration:none;">
+                                <i class="bi bi-box-arrow-right me-1"></i>Sair
+                            </button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cadastrar_usuario' %}">
+                            <i class="bi bi-person-plus me-1"></i>Criar conta
+                        </a>
+                    </li>
+                    <li class="nav-item ms-1">
+                        <a href="{% url 'login' %}" class="btn btn-accent btn-sm px-3 py-2">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Entrar
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="py-4 mt-4">
+    <div class="container">
+        <div class="row gy-3">
+            <div class="col-md-5">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-buildings-fill text-accent"></i>
+                    <span class="footer-heading mb-0">ImobiliáriaWeb</span>
+                </div>
+                <p class="small mb-0">Plataforma de gestão de imóveis para cadastro e acompanhamento.</p>
+            </div>
+            <div class="col-md-3">
+                <div class="footer-heading">Navegação</div>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="mb-1"><a href="{% url 'home' %}"><i class="bi bi-house-door me-1"></i>Imóveis</a></li>
+                    {% if user.is_staff %}
+                    <li class="mb-1"><a href="{% url 'cadastrar_imovel' %}"><i class="bi bi-plus-circle me-1"></i>Cadastrar imóvel</a></li>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">
-                                <i class="bi bi-box-arrow-in-right me-1"></i>Entrar
-                            </a>
-                        </li>
+                    <li class="mb-1"><a href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right me-1"></i>Entrar</a></li>
+                    <li class="mb-1"><a href="{% url 'cadastrar_usuario' %}"><i class="bi bi-person-plus me-1"></i>Criar conta</a></li>
                     {% endif %}
                 </ul>
             </div>
+            <div class="col-md-4 text-md-end">
+                <div class="footer-heading">GAC116</div>
+                <p class="small mb-0">Programação Web — 2026/1</p>
+            </div>
         </div>
-    </nav>
+        <hr class="divider my-3">
+        <p class="text-center small mb-0">© 2026 ImobiliáriaWeb</p>
+    </div>
+</footer>
 
-    <main class="container py-4">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer class="text-center text-muted py-3 mt-4">
-        <div class="container">
-            <small>GAC116 — Programação Web — 2026/1</small>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 10), { passive: true });
+</script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

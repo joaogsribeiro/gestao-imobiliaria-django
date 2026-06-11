@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar exclusão — ImobiliáriaWeb{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card" style="box-shadow:0 4px 20px rgba(0,0,0,.08)">
+            <div class="card-body p-4 text-center">
+                <div style="width:56px;height:56px;background:#fee2e2;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:1rem;">
+                    <i class="bi bi-trash3-fill" style="font-size:1.4rem;color:#dc2626"></i>
+                </div>
+                <h4 class="fw-bold mb-1">Confirmar exclusão</h4>
+                <p class="text-muted mb-1">Você está prestes a excluir o {{ tipo }}:</p>
+                <p class="fw-semibold fs-6 mb-3">"{{ objeto }}"</p>
+                <p class="text-danger small mb-4">
+                    <i class="bi bi-exclamation-triangle me-1"></i>Esta ação não pode ser desfeita.
+                </p>
+                <form method="post" class="d-flex gap-2 justify-content-center">
+                    {% csrf_token %}
+                    <a href="{{ cancel_url }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-lg me-1"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash3 me-1"></i>Sim, excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
