@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} — ImobiliáriaWeb{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-section { background:#fff; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,.05); }
+    .form-section-header { background:var(--surface); border-bottom:1px solid var(--border); padding:.85rem 1.5rem; font-weight:700; font-size:.875rem; color:var(--brand-mid); display:flex; align-items:center; gap:.5rem; }
+    .form-section-header i { color:var(--accent); }
+    .form-section-body { padding:1.5rem; }
+    .drop-zone { border:2px dashed var(--border); border-radius:var(--radius-sm); padding:1.75rem; text-align:center; transition:border-color var(--ease),background var(--ease); cursor:pointer; }
+    .drop-zone:hover,.drop-zone.drag-over { border-color:var(--accent); background:rgba(99,102,241,.04); }
+    .drop-zone input[type=file] { display:none; }
+    .preview-grid { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:.75rem; }
+    .preview-item { width:90px; height:70px; border-radius:8px; overflow:hidden; border:2px solid var(--border); }
+    .preview-item img { width:100%; height:100%; object-fit:cover; }
+    .existing-imgs { display:flex; flex-wrap:wrap; gap:.5rem; }
+    .existing-img-wrap { position:relative; width:90px; height:70px; }
+    .existing-img-wrap img { width:100%; height:100%; object-fit:cover; border-radius:8px; border:2px solid var(--border); }
+    .existing-img-wrap input[type=checkbox] { display:none; }
+    .existing-img-wrap label { position:absolute; inset:0; cursor:pointer; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .existing-img-wrap input:checked + label { background:rgba(220,38,38,.55); }
+    .existing-img-wrap input:checked + label::after { content:'\F5DE'; font-family:'bootstrap-icons'; color:#fff; font-size:1.5rem; }
+    .existing-img-wrap label:hover { background:rgba(0,0,0,.2); }
+    .del-hint { font-size:.78rem; color:var(--muted); margin-top:.4rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none text-accent">Imóveis</a></li>
+        {% if imovel %}<li class="breadcrumb-item"><a href="{% url 'detalhe_imovel' imovel.pk %}" class="text-decoration-none text-accent">{{ imovel.titulo }}</a></li>{% endif %}
+        <li class="breadcrumb-item active text-muted">{{ titulo }}</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <div class="d-flex align-items-center gap-2 mb-4">
+            <div style="width:40px;height:40px;background:rgba(99,102,241,.1);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-house-fill text-accent fs-5"></i>
+            </div>
+            <div>
+                <h1 class="section-title mb-0">{{ titulo }}</h1>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div class="form-section">
+                <div class="form-section-header"><i class="bi bi-tag-fill"></i>Identificação</div>
+                <div class="form-section-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.proprietario.label }}</label>
+                        {{ form.proprietario }}
+                        {% if form.proprietario.errors %}<div class="text-danger small mt-1">{{ form.proprietario.errors }}</div>{% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label">{{ form.titulo.label }}</label>
+                        {{ form.titulo }}
+                        {% if form.titulo.errors %}<div class="text-danger small mt-1">{{ form.titulo.errors }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-header"><i class="bi bi-geo-alt-fill"></i>Localização</div>
+                <div class="form-section-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">{{ form.endereco.label }}</label>
+                            {{ form.endereco }}
+                            {% if form.endereco.errors %}<div class="text-danger small mt-1">{{ form.endereco.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{{ form.bairro.label }}</label>
+                            {{ form.bairro }}
+                            {% if form.bairro.errors %}<div class="text-danger small mt-1">{{ form.bairro.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-header"><i class="bi bi-currency-dollar"></i>Valores e Status</div>
+                <div class="form-section-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.valor_aluguel.label }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text fw-semibold">R$</span>
+                                {{ form.valor_aluguel }}
+                            </div>
+                            {% if form.valor_aluguel.errors %}<div class="text-danger small mt-1">{{ form.valor_aluguel.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.status.label }}</label>
+                            {{ form.status }}
+                            {% if form.status.errors %}<div class="text-danger small mt-1">{{ form.status.errors }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-section-header"><i class="bi bi-images"></i>Fotos</div>
+                <div class="form-section-body">
+
+                    {% if imagens %}
+                    <p class="form-label mb-2">Fotos existentes <span class="text-muted fw-normal">(clique para marcar para exclusão)</span></p>
+                    <div class="existing-imgs mb-3">
+                        {% for img in imagens %}
+                        <div class="existing-img-wrap">
+                            <img src="{{ img.imagem.url }}" alt="">
+                            <input type="checkbox" name="deletar_imagens" value="{{ img.pk }}" id="del_{{ img.pk }}">
+                            <label for="del_{{ img.pk }}" title="Clique para excluir esta foto"></label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="drop-zone" id="dropZone" onclick="document.getElementById('id_imagens').click()">
+                        <input type="file" name="imagens" id="id_imagens" accept="image/*" multiple>
+                        <i class="bi bi-cloud-upload" style="font-size:2rem;color:#cbd5e1"></i>
+                        <p class="text-muted small mb-0 mt-1">
+                            <span style="color:var(--accent);font-weight:600">Clique para selecionar</span> ou arraste fotos aqui
+                        </p>
+                    </div>
+                    <div class="preview-grid" id="previewGrid"></div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+                <a href="{% if imovel %}{% url 'detalhe_imovel' imovel.pk %}{% else %}{% url 'home' %}{% endif %}"
+                   class="btn btn-outline-secondary">
+                    <i class="bi bi-x-lg me-1"></i>Cancelar
+                </a>
+                {% if imovel %}
+                <a href="{% url 'deletar_imovel' imovel.pk %}" class="btn btn-outline-danger">
+                    <i class="bi bi-trash3 me-1"></i>Excluir
+                </a>
+                {% endif %}
+                <button type="submit" class="btn btn-accent px-4">
+                    <i class="bi bi-check-lg me-1"></i>{{ titulo }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const input = document.getElementById('id_imagens');
+    const grid  = document.getElementById('previewGrid');
+    const zone  = document.getElementById('dropZone');
+
+    input.addEventListener('change', renderPreviews);
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault(); zone.classList.remove('drag-over');
+        input.files = e.dataTransfer.files; renderPreviews();
+    });
+
+    function renderPreviews() {
+        grid.innerHTML = '';
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = ev => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.innerHTML = `<img src="${ev.target.result}" alt="${file.name}">`;
+                grid.appendChild(item);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+</script>
+{% endblock %}
